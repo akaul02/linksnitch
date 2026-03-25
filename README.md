@@ -16,7 +16,7 @@ LinkSnitch is an Android research prototype for people who browse with a screen 
 
 ## Architecture
 
-![LinkSnitch system architecture](docs/architecture.png)
+![LinkSnitch system architecture](https://raw.githubusercontent.com/akaul02/linksnitch/main/docs/architecture.png)
 
 ## Build and run
 
