@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LinkSnitch</string>
+    <string name="accessibility_service_description">LinkSnitch helps protect you from phishing by analyzing links when you navigate with TalkBack.</string>
+</resources>
