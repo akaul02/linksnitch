@@ -1,0 +1,183 @@
+{
+  "version": 4,
+  "scopeLabels": {
+    "ctr_web": "Web client (browser)",
+    "ctr_api": "API service"
+  },
+  "context": {
+    "viewBox": "0 0 820 400",
+    "nodes": {
+      "person_analyst": {
+        "id": "person_analyst",
+        "kind": "person",
+        "title": "Analyst",
+        "summary": "Uses the browser UI to run queries and view dashboards."
+      },
+      "sys_acme_insights": {
+        "id": "sys_acme_insights",
+        "kind": "software-system",
+        "title": "Acme Insights",
+        "summary": "Fictional example: SPA plus a JSON API backed by a database and an external payment provider.",
+        "containerOverview": "Browser UI talks to the API over HTTPS. The API persists data and calls Stripe for billing webhooks."
+      },
+      "ext_stripe": {
+        "id": "ext_stripe",
+        "kind": "external",
+        "title": "Stripe",
+        "summary": "External payment and webhook events."
+      }
+    },
+    "edges": [
+      { "id": "ex-1", "from": "person_analyst", "to": "sys_acme_insights", "label": "Uses" },
+      { "id": "ex-2", "from": "sys_acme_insights", "to": "ext_stripe", "label": "HTTPS webhooks" }
+    ],
+    "layouts": {
+      "person_analyst": { "x": 36, "y": 160, "w": 156, "h": 96, "kind": "person" },
+      "sys_acme_insights": { "x": 260, "y": 140, "w": 260, "h": 128, "kind": "software-system" },
+      "ext_stripe": { "x": 600, "y": 168, "w": 180, "h": 88, "kind": "external" }
+    }
+  },
+  "containers": {
+    "viewBox": "0 0 820 380",
+    "nodes": {
+      "person_analyst": {
+        "id": "person_analyst",
+        "kind": "person",
+        "title": "Analyst",
+        "summary": "Same person as in context."
+      },
+      "ctr_web": {
+        "id": "ctr_web",
+        "kind": "container",
+        "title": "Single-page app",
+        "summary": "React (or similar) assets served as static files; calls `/api` on the same host."
+      },
+      "ctr_api": {
+        "id": "ctr_api",
+        "kind": "container",
+        "title": "HTTP API",
+        "summary": "Stateless handlers, ORM to Postgres, verifies Stripe signatures on webhook route."
+      },
+      "ext_stripe": {
+        "id": "ext_stripe",
+        "kind": "external",
+        "title": "Stripe",
+        "summary": "Billing webhooks."
+      }
+    },
+    "edges": [
+      { "id": "ct-1", "from": "person_analyst", "to": "ctr_web", "label": "Uses" },
+      { "id": "ct-2", "from": "ctr_web", "to": "ctr_api", "label": "HTTPS / JSON" },
+      { "id": "ct-3", "from": "ctr_api", "to": "ctr_web", "label": "JSON responses" },
+      { "id": "ct-4", "from": "ctr_api", "to": "ext_stripe", "label": "Webhook verify + calls" }
+    ],
+    "layouts": {
+      "person_analyst": { "x": 32, "y": 156, "w": 148, "h": 92, "kind": "person" },
+      "ctr_web": { "x": 228, "y": 72, "w": 200, "h": 88, "kind": "container" },
+      "ctr_api": { "x": 228, "y": 200, "w": 200, "h": 88, "kind": "container" },
+      "ext_stripe": { "x": 560, "y": 128, "w": 200, "h": 84, "kind": "external" }
+    }
+  },
+  "components": {
+    "ctr_web": {
+      "viewBox": "0 0 640 320",
+      "nodes": {
+        "w_routes": {
+          "id": "w_routes",
+          "kind": "component",
+          "title": "Router",
+          "techLabel": "[Component: React Router]",
+          "summary": "Maps URLs to dashboard vs settings pages."
+        },
+        "w_api_hooks": {
+          "id": "w_api_hooks",
+          "kind": "component",
+          "title": "API client",
+          "techLabel": "[Component: fetch / react-query]",
+          "summary": "Typed wrappers for `/api/reports` and `/api/me`."
+        },
+        "ext_api_peer": {
+          "id": "ext_api_peer",
+          "kind": "external",
+          "title": "API service (same origin)",
+          "summary": "Peer container reached over HTTP from the browser."
+        }
+      },
+      "edges": [
+        { "id": "w-e1", "from": "w_routes", "to": "w_api_hooks", "label": "Invokes" },
+        { "id": "w-e2", "from": "w_api_hooks", "to": "ext_api_peer", "label": "HTTPS", "dashed": true }
+      ],
+      "layouts": {
+        "w_routes": { "x": 48, "y": 48, "w": 200, "h": 96, "kind": "component" },
+        "w_api_hooks": { "x": 48, "y": 180, "w": 220, "h": 100, "kind": "component" },
+        "ext_api_peer": { "x": 360, "y": 100, "w": 220, "h": 92, "kind": "external" }
+      }
+    },
+    "ctr_api": {
+      "viewBox": "0 0 720 400",
+      "nodes": {
+        "a_http": {
+          "id": "a_http",
+          "kind": "component",
+          "title": "HTTP layer",
+          "techLabel": "[Component: Express or FastAPI]",
+          "summary": "Routes under `/api`, JSON bodies, auth middleware."
+        },
+        "a_domain": {
+          "id": "a_domain",
+          "kind": "component",
+          "title": "Domain services",
+          "techLabel": "[Component: app/services]",
+          "summary": "Report aggregation, user preferences."
+        },
+        "a_db": {
+          "id": "a_db",
+          "kind": "component",
+          "title": "Postgres",
+          "techLabel": "[Container: database]",
+          "summary": "Primary relational store (can be modeled as component when not a separate deployable)."
+        },
+        "ext_stripe": {
+          "id": "ext_stripe",
+          "kind": "external",
+          "title": "Stripe",
+          "summary": "Webhook endpoint and REST calls."
+        }
+      },
+      "edges": [
+        { "id": "a-e1", "from": "a_http", "to": "a_domain", "label": "Invokes" },
+        { "id": "a-e2", "from": "a_domain", "to": "a_db", "label": "SQL", "dashed": true },
+        { "id": "a-e3", "from": "a_http", "to": "ext_stripe", "label": "Webhooks", "dashed": true }
+      ],
+      "layouts": {
+        "a_http": { "x": 40, "y": 140, "w": 200, "h": 104, "kind": "component" },
+        "a_domain": { "x": 280, "y": 140, "w": 200, "h": 104, "kind": "component" },
+        "a_db": { "x": 280, "y": 280, "w": 200, "h": 88, "kind": "component" },
+        "ext_stripe": { "x": 520, "y": 140, "w": 168, "h": 88, "kind": "external" }
+      }
+    }
+  },
+  "codeViews": {
+    "a_http": {
+      "packageLabel": "example — src/api/server.ts",
+      "viewBox": "0 0 560 260",
+      "nodes": {
+        "cd_app": {
+          "id": "cd_app",
+          "kind": "code-class",
+          "title": "createApp()",
+          "subtitle": "Express app factory",
+          "members": [
+            "app.use(json())",
+            "app.get('/api/reports', …)",
+            "app.post('/webhooks/stripe', rawBody, verifySignature)"
+          ]
+        }
+      },
+      "edges": [],
+      "layouts": {
+        "cd_app": { "x": 120, "y": 70, "w": 320, "h": 120, "kind": "code-class" }
+      }
+    }
+  }
+}

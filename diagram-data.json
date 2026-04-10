@@ -1,0 +1,374 @@
+{
+  "version": 4,
+  "scopeLabels": {
+    "ctr_ui": "Compose UI (launcher & share result)",
+    "ctr_accessibility": "Background accessibility service",
+    "ctr_analysis": "URL detection, heuristics, copy",
+    "ctr_audio": "Text-to-speech playback"
+  },
+  "context": {
+    "viewBox": "0 0 920 420",
+    "nodes": {
+      "person_user": {
+        "id": "person_user",
+        "kind": "person",
+        "title": "Screen reader user",
+        "summary": "Uses TalkBack (or similar), shares links from other apps, and enables LinkSnitch’s accessibility service for focus-based checks."
+      },
+      "sys_linksnitch": {
+        "id": "sys_linksnitch",
+        "kind": "software-system",
+        "title": "LinkSnitch (Android)",
+        "summary": "Single-package HCI research app (`com.research.hci.linksnitch`) that extracts URLs from focused or shared text, scores them with heuristics, and speaks short warnings via TTS.",
+        "containerOverview": "Jetpack Compose launcher (`MainActivity` / `MainScreen`), `ShareActivity` for ACTION_SEND, `LinkSnitchAccessibilityService` for TYPE_VIEW_ACCESSIBILITY_FOCUSED, `TtsService` + `TtsManager` for speech, and Kotlin objects `UrlDetector`, `UrlAnalyzer`, `ExplanationGenerator` for analysis."
+      },
+      "ext_host_apps": {
+        "id": "ext_host_apps",
+        "kind": "external",
+        "title": "Host apps (browser, email, …)",
+        "summary": "Third-party apps that provide plain text via Android Share or expose link text in the accessibility tree."
+      },
+      "ext_android_platform": {
+        "id": "ext_android_platform",
+        "kind": "external",
+        "title": "Android OS",
+        "summary": "Delivers accessibility focus events; provides `TextToSpeech`, audio focus, and `Settings` for enabling the accessibility service."
+      }
+    },
+    "edges": [
+      { "id": "ctx-1", "from": "person_user", "to": "sys_linksnitch", "label": "Uses" },
+      { "id": "ctx-2", "from": "ext_host_apps", "to": "sys_linksnitch", "label": "Share / on-screen text" },
+      { "id": "ctx-3", "from": "sys_linksnitch", "to": "ext_android_platform", "label": "A11y events, TTS, settings" }
+    ],
+    "layouts": {
+      "person_user": { "x": 40, "y": 140, "w": 168, "h": 96, "kind": "person" },
+      "sys_linksnitch": { "x": 300, "y": 100, "w": 300, "h": 160, "kind": "software-system" },
+      "ext_host_apps": { "x": 660, "y": 60, "w": 200, "h": 100, "kind": "external" },
+      "ext_android_platform": { "x": 660, "y": 220, "w": 200, "h": 100, "kind": "external" }
+    }
+  },
+  "containers": {
+    "viewBox": "0 0 980 520",
+    "nodes": {
+      "person_user": {
+        "id": "person_user",
+        "kind": "person",
+        "title": "Screen reader user",
+        "summary": "Same actor as context."
+      },
+      "ctr_ui": {
+        "id": "ctr_ui",
+        "kind": "container",
+        "title": "UI layer (Activities + Compose)",
+        "summary": "`MainActivity` (launcher + accessibility enablement), `ShareActivity` (ACTION_SEND, analysis + `AnalysisScreen`), `MainScreen`, `LinkSnitchTheme`. Kotlin + Jetpack Compose; Material3.",
+        "techLabel": "[Container: app module / src/main/java]"
+      },
+      "ctr_accessibility": {
+        "id": "ctr_accessibility",
+        "kind": "container",
+        "title": "Accessibility service",
+        "summary": "`LinkSnitchAccessibilityService` handles `TYPE_VIEW_ACCESSIBILITY_FOCUSED`, debounces warnings, plays a beep, and uses embedded `TtsManager` for speech.",
+        "techLabel": "[Container: AccessibilityService]"
+      },
+      "ctr_analysis": {
+        "id": "ctr_analysis",
+        "kind": "container",
+        "title": "Analysis core",
+        "summary": "`UrlDetector` (`Patterns.WEB_URL`), `UrlAnalyzer` (heuristics + `URI`/`IDN`), `ExplanationGenerator`, and `AnalysisResult` / `Finding` / `WarningType` models.",
+        "techLabel": "[Container: Kotlin singletons + models]"
+      },
+      "ctr_audio": {
+        "id": "ctr_audio",
+        "kind": "container",
+        "title": "TTS",
+        "summary": "`TtsManager` wraps Android `TextToSpeech` with `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK`. `TtsService` is started from `ShareActivity` with `textToSpeak` extra.",
+        "techLabel": "[Container: Service + helper class]"
+      },
+      "ext_host_apps": {
+        "id": "ext_host_apps",
+        "kind": "external",
+        "title": "Host apps",
+        "summary": "Issue `ACTION_SEND` with `text/plain` to open `ShareActivity`."
+      },
+      "ext_android_platform": {
+        "id": "ext_android_platform",
+        "kind": "external",
+        "title": "Android OS",
+        "summary": "Accessibility pipeline, `AudioManager`, `TextToSpeech` engine."
+      }
+    },
+    "edges": [
+      { "id": "ct-1", "from": "person_user", "to": "ctr_ui", "label": "Launcher & Share" },
+      { "id": "ct-2", "from": "person_user", "to": "ctr_accessibility", "label": "Enables service" },
+      { "id": "ct-3", "from": "ext_host_apps", "to": "ctr_ui", "label": "ACTION_SEND" },
+      { "id": "ct-4", "from": "ctr_accessibility", "to": "ctr_analysis", "label": "Kotlin calls" },
+      { "id": "ct-5", "from": "ctr_ui", "to": "ctr_analysis", "label": "Kotlin calls" },
+      { "id": "ct-6", "from": "ctr_accessibility", "to": "ctr_audio", "label": "TtsManager" },
+      { "id": "ct-7", "from": "ctr_ui", "to": "ctr_audio", "label": "startService(TtsService)" },
+      { "id": "ct-8", "from": "ctr_accessibility", "to": "ext_android_platform", "label": "A11y events", "dashed": true },
+      { "id": "ct-9", "from": "ctr_audio", "to": "ext_android_platform", "label": "TTS + audio focus", "dashed": true }
+    ],
+    "layouts": {
+      "person_user": { "x": 32, "y": 200, "w": 152, "h": 92, "kind": "person" },
+      "ctr_ui": { "x": 220, "y": 80, "w": 220, "h": 100, "kind": "container" },
+      "ctr_accessibility": { "x": 220, "y": 220, "w": 240, "h": 100, "kind": "container" },
+      "ctr_analysis": { "x": 500, "y": 140, "w": 260, "h": 100, "kind": "container" },
+      "ctr_audio": { "x": 500, "y": 280, "w": 220, "h": 92, "kind": "container" },
+      "ext_host_apps": { "x": 780, "y": 60, "w": 180, "h": 88, "kind": "external" },
+      "ext_android_platform": { "x": 780, "y": 360, "w": 180, "h": 88, "kind": "external" }
+    }
+  },
+  "components": {
+    "ctr_ui": {
+      "viewBox": "0 0 720 400",
+      "nodes": {
+        "ui_main_activity": {
+          "id": "ui_main_activity",
+          "kind": "component",
+          "title": "MainActivity",
+          "techLabel": "[Component: MainActivity.kt]",
+          "summary": "Launcher `ComponentActivity`: Compose `LinkSnitchTheme`, `MainScreen`, checks `Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES` for `LinkSnitchAccessibilityService`, opens accessibility settings."
+        },
+        "ui_main_screen": {
+          "id": "ui_main_screen",
+          "kind": "component",
+          "title": "MainScreen",
+          "techLabel": "[Component: MainScreen.kt]",
+          "summary": "Composable instructions and conditional button to enable the accessibility service when disabled."
+        },
+        "ui_share_activity": {
+          "id": "ui_share_activity",
+          "kind": "component",
+          "title": "ShareActivity",
+          "techLabel": "[Component: ShareActivity.kt]",
+          "summary": "Handles `ACTION_SEND` `text/plain`: `UrlDetector.findUrls` → `UrlAnalyzer.analyze` → `ExplanationGenerator` for suspicious; `setContent` with `AnalysisScreen`; starts `TtsService` with `textToSpeak` extra."
+        },
+        "ui_analysis_screen": {
+          "id": "ui_analysis_screen",
+          "kind": "component",
+          "title": "AnalysisScreen",
+          "techLabel": "[Component: ShareActivity.kt]",
+          "summary": "Composable: safe vs warning gradient, icon, explanation text, Done button."
+        },
+        "ui_share_viewmodel": {
+          "id": "ui_share_viewmodel",
+          "kind": "component",
+          "title": "ShareViewModel",
+          "techLabel": "[Component: ShareViewModel.kt]",
+          "summary": "Holds `ShareUiState`/`StateFlow` and `analyzeUrlFromText` mirroring the analysis pipeline; **not referenced by `ShareActivity` today** (analysis is inlined in `onCreate`)."
+        }
+      },
+      "edges": [
+        { "id": "ui-e1", "from": "ui_main_activity", "to": "ui_main_screen", "label": "setContent" },
+        { "id": "ui-e2", "from": "ui_share_activity", "to": "ui_analysis_screen", "label": "setContent" },
+        { "id": "ui-e3", "from": "ui_share_activity", "to": "ui_share_viewmodel", "label": "Not wired", "dashed": true }
+      ],
+      "layouts": {
+        "ui_main_activity": { "x": 40, "y": 40, "w": 220, "h": 104, "kind": "component" },
+        "ui_main_screen": { "x": 40, "y": 180, "w": 220, "h": 100, "kind": "component" },
+        "ui_share_activity": { "x": 360, "y": 40, "w": 240, "h": 120, "kind": "component" },
+        "ui_analysis_screen": { "x": 360, "y": 200, "w": 240, "h": 100, "kind": "component" },
+        "ui_share_viewmodel": { "x": 360, "y": 320, "w": 240, "h": 72, "kind": "component" }
+      }
+    },
+    "ctr_accessibility": {
+      "viewBox": "0 0 640 360",
+      "nodes": {
+        "a11y_service": {
+          "id": "a11y_service",
+          "kind": "component",
+          "title": "LinkSnitchAccessibilityService",
+          "techLabel": "[Component: LinkSnitchAccessibilityService.kt]",
+          "summary": "Listens for `TYPE_VIEW_ACCESSIBILITY_FOCUSED`, reads `text`/`contentDescription`, first URL via `UrlDetector`, `UrlAnalyzer.analyze` → `ExplanationGenerator` for suspicious; 3s delay then `ToneGenerator` beep + `TtsManager.speakWarning`."
+        },
+        "ext_talkback": {
+          "id": "ext_talkback",
+          "kind": "external",
+          "title": "TalkBack / stream",
+          "summary": "Other audio on `STREAM_ACCESSIBILITY` / music ducking while `TtsManager` holds transient focus."
+        }
+      },
+      "edges": [
+        { "id": "a11y-e1", "from": "a11y_service", "to": "ext_talkback", "label": "Ducks with TTS", "dashed": true }
+      ],
+      "layouts": {
+        "a11y_service": { "x": 120, "y": 100, "w": 360, "h": 140, "kind": "component" },
+        "ext_talkback": { "x": 120, "y": 280, "w": 200, "h": 72, "kind": "external" }
+      }
+    },
+    "ctr_analysis": {
+      "viewBox": "0 0 800 400",
+      "nodes": {
+        "an_url_detector": {
+          "id": "an_url_detector",
+          "kind": "component",
+          "title": "UrlDetector",
+          "techLabel": "[Component: UrlDetector.kt]",
+          "summary": "Object: `Patterns.WEB_URL` matcher over `CharSequence`; returns `List<String>` of matches."
+        },
+        "an_url_analyzer": {
+          "id": "an_url_analyzer",
+          "kind": "component",
+          "title": "UrlAnalyzer",
+          "techLabel": "[Component: UrlAnalyzer.kt]",
+          "summary": "Object: `URI`/`IDN` punycode, IP regex, shortener host set, suspicious TLD set, keyword scan on full URL, subdomain depth, brand whitelist vs `getRegisteredDomain` (last two labels); `Suspicious` only if non-keyword findings exist. Imports OkHttp types are unused in current file."
+        },
+        "an_explanation_generator": {
+          "id": "an_explanation_generator",
+          "kind": "component",
+          "title": "ExplanationGenerator",
+          "techLabel": "[Component: ExplanationGenerator.kt]",
+          "summary": "Object: prioritizes brand mismatch, then TLD/keywords/IP/shortener/punycode; prefixes spoken text with LinkSnitch plus colon."
+        },
+        "an_domain_models": {
+          "id": "an_domain_models",
+          "kind": "component",
+          "title": "AnalysisResult & Finding",
+          "techLabel": "[Component: AnalysisResult.kt]",
+          "summary": "`AnalysisResult` sealed (`Safe` / `Suspicious` with `List<Finding>`), `Finding` fields by `WarningType` enum."
+        }
+      },
+      "edges": [
+        { "id": "an-e1", "from": "an_url_detector", "to": "an_url_analyzer", "label": "URL string" },
+        { "id": "an-e2", "from": "an_url_analyzer", "to": "an_domain_models", "label": "builds" },
+        { "id": "an-e3", "from": "an_url_analyzer", "to": "an_explanation_generator", "label": "findings → text", "dashed": true },
+        { "id": "an-e4", "from": "an_explanation_generator", "to": "an_domain_models", "label": "reads", "dashed": true }
+      ],
+      "layouts": {
+        "an_url_detector": { "x": 40, "y": 140, "w": 200, "h": 96, "kind": "component" },
+        "an_url_analyzer": { "x": 280, "y": 120, "w": 240, "h": 120, "kind": "component" },
+        "an_explanation_generator": { "x": 560, "y": 100, "w": 220, "h": 100, "kind": "component" },
+        "an_domain_models": { "x": 280, "y": 280, "w": 240, "h": 88, "kind": "component" }
+      }
+    },
+    "ctr_audio": {
+      "viewBox": "0 0 560 280",
+      "nodes": {
+        "au_tts_manager": {
+          "id": "au_tts_manager",
+          "kind": "component",
+          "title": "TtsManager",
+          "techLabel": "[Component: TtsManager.kt]",
+          "summary": "Class: `TextToSpeech` with `UtteranceProgressListener`, `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` on `STREAM_MUSIC`, `speakWarning`, `shutdown`."
+        },
+        "au_tts_service": {
+          "id": "au_tts_service",
+          "kind": "component",
+          "title": "TtsService",
+          "techLabel": "[Component: TtsService.kt]",
+          "summary": "Service: creates `TtsManager`, reads `textToSpeak` from intent, `START_NOT_STICKY`."
+        }
+      },
+      "edges": [
+        { "id": "au-e1", "from": "au_tts_service", "to": "au_tts_manager", "label": "uses" }
+      ],
+      "layouts": {
+        "au_tts_manager": { "x": 280, "y": 80, "w": 220, "h": 100, "kind": "component" },
+        "au_tts_service": { "x": 60, "y": 80, "w": 220, "h": 100, "kind": "component" }
+      }
+    }
+  },
+  "codeViews": {
+    "an_url_analyzer": {
+      "packageLabel": "com.research.hci.linksnitch — UrlAnalyzer.kt",
+      "viewBox": "0 0 620 420",
+      "nodes": {
+        "cd_UrlAnalyzer": {
+          "id": "cd_UrlAnalyzer",
+          "kind": "code-class",
+          "title": "object UrlAnalyzer",
+          "subtitle": "Heuristic engine",
+          "members": [
+            "fun analyze(url: String): AnalysisResult",
+            "private fun getRegisteredDomain(host: String): String",
+            "private val SHORTENER_DOMAINS, SUSPICIOUS_KEYWORDS, SUSPICIOUS_TLDS, BRAND_WHITELIST"
+          ]
+        }
+      },
+      "edges": [],
+      "layouts": {
+        "cd_UrlAnalyzer": { "x": 140, "y": 120, "w": 340, "h": 160, "kind": "code-class" }
+      }
+    },
+    "a11y_service": {
+      "packageLabel": "com.research.hci.linksnitch — LinkSnitchAccessibilityService.kt",
+      "viewBox": "0 0 620 360",
+      "nodes": {
+        "cd_LinkSnitchAccessibilityService": {
+          "id": "cd_LinkSnitchAccessibilityService",
+          "kind": "code-class",
+          "title": "class LinkSnitchAccessibilityService",
+          "subtitle": "extends AccessibilityService",
+          "members": [
+            "onAccessibilityEvent(event): filter TYPE_VIEW_ACCESSIBILITY_FOCUSED",
+            "text from source.text / contentDescription",
+            "UrlDetector.findUrls(text).firstOrNull()",
+            "UrlAnalyzer.analyze(url) → ExplanationGenerator.generate(findings)",
+            "Handler.postDelayed(3000) → ToneGenerator + ttsManager.speakWarning()",
+            "onDestroy: removeCallbacks, ttsManager.shutdown()"
+          ]
+        }
+      },
+      "edges": [],
+      "layouts": {
+        "cd_LinkSnitchAccessibilityService": { "x": 80, "y": 80, "w": 460, "h": 200, "kind": "code-class" }
+      }
+    },
+    "ui_share_activity": {
+      "packageLabel": "com.research.hci.linksnitch — ShareActivity.kt",
+      "viewBox": "0 0 620 420",
+      "nodes": {
+        "cd_ShareActivity": {
+          "id": "cd_ShareActivity",
+          "kind": "code-class",
+          "title": "class ShareActivity",
+          "subtitle": "ComponentActivity",
+          "members": [
+            "onCreate: EXTRA_TEXT → UrlDetector.findUrls.firstOrNull()",
+            "UrlAnalyzer.analyze → ExplanationGenerator or safe default string",
+            "startService(Intent(TtsService).putExtra(\"textToSpeak\", explanation))",
+            "setContent { AnalysisScreen(...) }"
+          ]
+        },
+        "cd_AnalysisScreen": {
+          "id": "cd_AnalysisScreen",
+          "kind": "code-class",
+          "title": "fun AnalysisScreen",
+          "subtitle": "@Composable",
+          "members": [
+            "Gradient background, icon, title Safe/Warning, explanation, Done"
+          ]
+        }
+      },
+      "edges": [
+        { "id": "cd-e1", "from": "cd_ShareActivity", "to": "cd_AnalysisScreen", "label": "composes" }
+      ],
+      "layouts": {
+        "cd_ShareActivity": { "x": 60, "y": 60, "w": 300, "h": 160, "kind": "code-class" },
+        "cd_AnalysisScreen": { "x": 60, "y": 260, "w": 300, "h": 120, "kind": "code-class" }
+      }
+    },
+    "au_tts_manager": {
+      "packageLabel": "com.research.hci.linksnitch — TtsManager.kt",
+      "viewBox": "0 0 560 300",
+      "nodes": {
+        "cd_TtsManager": {
+          "id": "cd_TtsManager",
+          "kind": "code-class",
+          "title": "class TtsManager",
+          "subtitle": "TextToSpeech.OnInitListener",
+          "members": [
+            "fun speakWarning(text: String)",
+            "requestAudioFocus(TRANSIENT_MAY_DUCK) on STREAM_MUSIC",
+            "UtteranceProgressListener → abandonAudioFocus on done/error",
+            "fun shutdown()"
+          ]
+        }
+      },
+      "edges": [],
+      "layouts": {
+        "cd_TtsManager": { "x": 100, "y": 80, "w": 360, "h": 140, "kind": "code-class" }
+      }
+    }
+  }
+}

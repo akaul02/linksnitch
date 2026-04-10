@@ -1,0 +1,84 @@
+{
+  "version": 4,
+  "scopeLabels": {
+    "ctr_app": "REPLACE: short label for this container (shown when drilled)"
+  },
+  "context": {
+    "viewBox": "0 0 640 360",
+    "nodes": {
+      "person_user": {
+        "id": "person_user",
+        "kind": "person",
+        "title": "REPLACE: Person title",
+        "summary": "REPLACE: How they use the system."
+      },
+      "sys_product": {
+        "id": "sys_product",
+        "kind": "software-system",
+        "title": "REPLACE: Product name",
+        "summary": "REPLACE: One paragraph system boundary.",
+        "containerOverview": "REPLACE: Optional. What lives inside the boundary at a high level."
+      }
+    },
+    "edges": [
+      {
+        "id": "ctx-person-system",
+        "from": "person_user",
+        "to": "sys_product",
+        "label": "Uses"
+      }
+    ],
+    "layouts": {
+      "person_user": { "x": 48, "y": 140, "w": 152, "h": 96, "kind": "person" },
+      "sys_product": { "x": 260, "y": 120, "w": 240, "h": 120, "kind": "software-system" }
+    }
+  },
+  "containers": {
+    "viewBox": "0 0 640 340",
+    "nodes": {
+      "person_user": {
+        "id": "person_user",
+        "kind": "person",
+        "title": "REPLACE: Person title",
+        "summary": "Same actor as context; keep the same id if reused."
+      },
+      "ctr_app": {
+        "id": "ctr_app",
+        "kind": "container",
+        "title": "REPLACE: Runnable unit (e.g. Web app, API service)",
+        "summary": "REPLACE: Tech stack and responsibility."
+      }
+    },
+    "edges": [
+      {
+        "id": "ctr-person-app",
+        "from": "person_user",
+        "to": "ctr_app",
+        "label": "Uses"
+      }
+    ],
+    "layouts": {
+      "person_user": { "x": 40, "y": 140, "w": 148, "h": 92, "kind": "person" },
+      "ctr_app": { "x": 240, "y": 124, "w": 220, "h": 96, "kind": "container" }
+    }
+  },
+  "components": {
+    "ctr_app": {
+      "viewBox": "0 0 520 300",
+      "nodes": {
+        "comp_main": {
+          "id": "comp_main",
+          "kind": "component",
+          "title": "REPLACE: Major module",
+          "techLabel": "[Component: REPLACE]",
+          "summary": "REPLACE: What it does; tie to real files or packages."
+        }
+      },
+      "edges": [],
+      "layouts": {
+        "comp_main": { "x": 140, "y": 90, "w": 220, "h": 104, "kind": "component" }
+      }
+    }
+  },
+  "codeViews": {}
+}
